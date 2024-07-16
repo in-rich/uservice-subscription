@@ -1,0 +1,15 @@
+packages:
+  github.com/in-rich/uservice-subscription/pkg/dao:
+    config:
+      all: True
+      recursive: true
+      with-expecter: true
+      outpkg: daomocks
+      dir: pkg/dao/mocks
+  github.com/in-rich/uservice-subscription/pkg/services:
+    config:
+      all: True
+      recursive: true
+      with-expecter: true
+      outpkg: servicesmocks
+      dir: pkg/services/mocks
