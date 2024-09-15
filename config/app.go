@@ -2,8 +2,7 @@ package config
 
 import (
 	_ "embed"
-	"github.com/goccy/go-yaml"
-	"os"
+	"github.com/in-rich/lib-go/deploy"
 	"time"
 )
 
@@ -29,17 +28,4 @@ type AppType struct {
 	FreeTier TierInformation `yaml:"free-tier"`
 }
 
-var App AppType
-
-func init() {
-	switch os.Getenv("ENV") {
-	case "prod":
-		panic("not implemented")
-	case "staging":
-		panic("not implemented")
-	default:
-		if err := yaml.Unmarshal(appDevFile, &App); err != nil {
-			panic(err)
-		}
-	}
-}
+var App = deploy.LoadConfig[AppType](deploy.DevConfig(appDevFile))

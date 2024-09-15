@@ -6,13 +6,14 @@ require (
 	github.com/go-playground/validator/v10 v10.22.1
 	github.com/goccy/go-yaml v1.12.0
 	github.com/google/uuid v1.6.0
-	github.com/in-rich/proto/proto-go v0.0.0-20240823000751-f7902ffe130f
+	github.com/in-rich/lib-go v0.0.0-20240915223701-eac51d5839fc
+	github.com/in-rich/proto/proto-go v0.0.0-20240910093514-23d9ea0c1786
 	github.com/samber/lo v1.47.0
 	github.com/stretchr/testify v1.9.0
 	github.com/uptrace/bun v1.2.3
 	github.com/uptrace/bun/dialect/pgdialect v1.2.3
 	github.com/uptrace/bun/driver/pgdriver v1.2.3
-	google.golang.org/grpc v1.66.1
+	google.golang.org/grpc v1.66.2
 )
 
 require (
@@ -39,5 +40,5 @@ require (
 	google.golang.org/genproto/googleapis/rpc v0.0.0-20240903143218-8af14fe29dc1 // indirect
 	google.golang.org/protobuf v1.34.2 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
-	mellium.im/sasl v0.3.1 // indirect
+	mellium.im/sasl v0.3.2 // indirect
 )
