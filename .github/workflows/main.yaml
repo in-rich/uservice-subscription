@@ -1,0 +1,207 @@
+name: main
+
+on: [ push ]
+
+jobs:
+  prepare:
+    runs-on: ubuntu-latest
+    env:
+      GOPRIVATE: github.com/in-rich/*
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-go@v5
+        with:
+          go-version: '1.23.1'
+      - name: Retrieve Github credentials
+        run: git config --global url.https://${{ secrets.GOPRIVATE_ACCESS_TOKEN }}@github.com/.insteadOf https://github.com/
+      - name: Download Go packages
+        run: go mod download
+      - name: Vendor Go packages
+        run: go mod vendor
+      - name: Upload vendor
+        uses: actions/upload-artifact@v4
+        with:
+          name: vendor
+          path: ./vendor/
+          if-no-files-found: error
+          retention-days: 1
+          compression-level: 0
+
+  # --------------------------------------------------------------------------------
+  # Test stage
+  # --------------------------------------------------------------------------------
+  test:
+    needs: [ prepare ]
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_PASSWORD: test
+          POSTGRES_USER: test
+          POSTGRES_DB: test
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          - 5432:5432
+    env:
+      GOPRIVATE: github.com/in-rich/*
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-go@v5
+        with:
+          go-version: '1.23.1'
+      - name: Retrieve Go packages
+        uses: actions/download-artifact@v4
+        with:
+          name: vendor
+          path: ./vendor/
+      - name: Run tests
+        run: go test ./... -count=1 -p 1 -v -coverpkg=./...
+
+  # --------------------------------------------------------------------------------
+  # Build stage
+  # --------------------------------------------------------------------------------
+  build:
+    runs-on: ubuntu-latest
+    needs: [ prepare ]
+    services:
+      postgres:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_USER: postgres
+          POSTGRES_DB: postgres
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          - 1401:5432
+    env:
+      PORT: 1400
+      GOPRIVATE: github.com/in-rich/*
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-go@v5
+        with:
+          go-version: '1.23.1'
+      - name: Retrieve Go packages
+        uses: actions/download-artifact@v4
+        with:
+          name: vendor
+          path: ./vendor/
+      - name: Build Docker image
+        run: docker build . -t uservice
+      - name: Install check tools
+        run: |
+          wget https://github.com/grpc-ecosystem/grpc-health-probe/releases/download/v0.4.34/grpc_health_probe-linux-amd64 -O grpc_health_probe
+          chmod +x grpc_health_probe
+          sudo apt install netcat
+      - name: Run Docker image
+        id: local_container
+        run: |
+          docker run -d \
+            -p $PORT:$PORT --network="host" \
+            -e PORT="$PORT" \
+            --name uservice-container \
+            uservice
+          until [ "`docker inspect -f {{.State.Running}} uservice-container`"=="true" ]
+          do 
+            sleep 0.1
+          done
+      - name: TCP check
+        run: |
+          while ! nc -z localhost $PORT
+          do 
+            ((c++)) && ((c==100)) && break
+            sleep 0.1
+          done
+          nc -z localhost $PORT
+      - name: GRPC check
+        run: |
+          while ! ./grpc_health_probe -addr=localhost:$PORT
+          do 
+            ((c++)) && ((c==100)) && break
+            sleep 0.1
+          done
+          ./grpc_health_probe -addr=localhost:$PORT
+      - name: Show container logs
+        if: ${{ failure() && steps.local_container.outcome == 'success' }}
+        run: docker logs uservice-container
+      - name: Cleanup local container
+        if: ${{ always() && steps.local_container.outcome == 'success' }}
+        run: docker stop uservice-container
+
+  # --------------------------------------------------------------------------------
+  # Deploy stage
+  # --------------------------------------------------------------------------------
+  deploy-preprod:
+    runs-on: ubuntu-latest
+    needs: [ test, build ]
+    if: github.ref == 'refs/heads/staging' && success()
+    environment: staging
+    permissions:
+      contents: read
+      id-token: write
+    steps:
+      - uses: actions/checkout@v4
+      - name: Retrieve Go packages
+        uses: actions/download-artifact@v4
+        with:
+          name: vendor
+          path: ./vendor/
+      - uses: google-github-actions/auth@v2
+        with:
+          workload_identity_provider: ${{ secrets.PREPROD_IDENTITY_PROVIDER }}
+          service_account: ${{ secrets.PREPROD_SERVICE_ACCOUNT }}
+      - uses: google-github-actions/deploy-cloudrun@v2
+        with:
+          env_vars: |
+            GOPRIVATE=github.com/in-rich/*
+            ENV=staging
+            RELEASE=${{ github.sha }}
+          service: uservice-subscription
+          region: europe-west9
+          project_id: inrich-preprod
+          source: ./
+          flags: '--concurrency=100 --ingress=all --max-instances=3 --min-instances=1 --platform=managed --timeout=1m --cpu=1 --memory=512Mi --use-http2 --no-allow-unauthenticated --execution-environment=gen1 --cpu-boost --update-secrets=DSN=uservice-subscription-dsn:latest'
+      - name: Deploy results
+        run: echo ${{ steps.deploy.outputs.url }}
+
+  deploy-prod:
+    runs-on: ubuntu-latest
+    needs: [ test, build ]
+    if: github.ref == 'refs/heads/master' && success()
+    environment: production
+    permissions:
+      contents: read
+      id-token: write
+    steps:
+      - uses: actions/checkout@v4
+      - name: Retrieve Go packages
+        uses: actions/download-artifact@v4
+        with:
+          name: vendor
+          path: ./vendor/
+      - uses: google-github-actions/auth@v2
+        with:
+          workload_identity_provider: ${{ secrets.PROD_IDENTITY_PROVIDER }}
+          service_account: ${{ secrets.PROD_SERVICE_ACCOUNT }}
+      - uses: google-github-actions/deploy-cloudrun@v2
+        with:
+          env_vars: |
+            GOPRIVATE=github.com/in-rich/*
+            ENV=prod
+            RELEASE=${{ github.sha }}
+          service: uservice-subscription
+          region: europe-west9
+          project_id: inrich-f9a0a
+          source: ./
+          flags: '--concurrency=100 --ingress=all --max-instances=3 --min-instances=1 --platform=managed --timeout=1m --cpu=1 --memory=512Mi --use-http2 --no-allow-unauthenticated --execution-environment=gen1 --cpu-boost --update-secrets=DSN=uservice-subscription-dsn:latest'
+      - name: Deploy results
+        run: echo ${{ steps.deploy.outputs.url }}

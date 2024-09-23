@@ -1,7 +1,7 @@
 server:
-  port: 1400
+  port: ${PORT}
 postgres:
-  dsn: postgres://postgres:postgres@localhost:1401/postgres?sslmode=disable
+  dsn: ${DSN}
 
 free-tier:
   notes:
