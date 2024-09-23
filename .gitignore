@@ -1,1 +1,11 @@
+# IDE files
 .idea
+
+# Firebase secret (used for local development)
+firebase-key.json
+
+# Log files
+*.log
+
+# Ignore generated credentials from google-github-actions/auth
+gha-creds-*.json

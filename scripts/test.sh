@@ -8,6 +8,6 @@ trap int_handler INT
 
 docker compose -f docker-compose.test.yml up -d
 
-gotestsum --format pkgname -- -p 1 ./...
+go run gotest.tools/gotestsum@latest --format pkgname -- -p 1 ./...
 
 docker compose -f docker-compose.test.yml down

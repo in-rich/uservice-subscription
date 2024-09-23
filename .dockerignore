@@ -1,0 +1,22 @@
+# Git files
+.git
+.github
+.gitignore
+
+# IDE files
+.idea
+
+# Env files
+.envrc
+
+# Firebase files
+firestore-debug.log
+firebase-key.json
+ui-debug.log
+
+# Those files are not used for building
+README.md
+Makefile
+
+# Ignore generated credentials from google-github-actions/auth
+gha-creds-*.json

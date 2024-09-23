@@ -9,6 +9,12 @@ import (
 //go:embed app.dev.yaml
 var appDevFile []byte
 
+//go:embed app.staging.yaml
+var appStagingFile []byte
+
+//go:embed app.prod.yaml
+var appProdFile []byte
+
 type NoteTierInformation struct {
 	MaxEdits       int            `yaml:"max-edits"`
 	CountEditsOver *time.Duration `yaml:"count-edits-over"`
@@ -28,4 +34,8 @@ type AppType struct {
 	FreeTier TierInformation `yaml:"free-tier"`
 }
 
-var App = deploy.LoadConfig[AppType](deploy.DevConfig(appDevFile))
+var App = deploy.LoadConfig[AppType](
+	deploy.DevConfig(appDevFile),
+	deploy.StagingConfig(appStagingFile),
+	deploy.ProdConfig(appProdFile),
+)
