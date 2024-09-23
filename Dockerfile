@@ -12,15 +12,17 @@ WORKDIR /
 
 COPY --from=builder /server /server
 
-ENV PORT $PORT
+ARG PORT=8080
+ARG DSN
+ARG ENV
 
-ENV DSN $DSN
+ENV PORT=$PORT
+ENV DSN=$DSN
+ENV ENV=$ENV
 
-ENV ENV $ENV
+ENV HOST="0.0.0.0"
 
 EXPOSE $PORT
-
-ENV HOST "0.0.0.0"
 
 # Run
 CMD ["/server"]
