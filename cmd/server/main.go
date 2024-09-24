@@ -24,6 +24,15 @@ func main() {
 		log.Fatalf("failed to migrate: %v", err)
 	}
 
+	depCheck := func() map[string]bool {
+		errDB := db.Ping()
+
+		return map[string]bool{
+			"CanUpdateNote": errDB == nil,
+			"":              errDB == nil,
+		}
+	}
+
 	countNoteEditsByAuthorDAO := dao.NewCountNoteEditsByAuthorRepository(db)
 	createNoteEditDAO := dao.NewCreateNoteEditRepository(db)
 	getLatestNoteEditByAuthorDAO := dao.NewGetLatestNoteEditByAuthorRepository(db)
@@ -33,7 +42,7 @@ func main() {
 	canUpdateNoteHandler := handlers.NewCanUpdateNoteHandler(canUpdateNoteService)
 
 	log.Println("Starting to listen on port", config.App.Server.Port)
-	listener, server, health := deploy.StartGRPCServer(config.App.Server.Port)
+	listener, server, health := deploy.StartGRPCServer(config.App.Server.Port, depCheck)
 	defer deploy.CloseGRPCServer(listener, server)
 	go health()
 
