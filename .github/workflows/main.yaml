@@ -171,7 +171,7 @@ jobs:
         with:
           package-name: ${{ github.event.repository.name }}/${{ github.head_ref || github.ref_name }}
           package-type: 'container'
-          min-versions-to-keep: 3
+          min-versions-to-keep: 60
           delete-only-pre-release-versions: false
           delete-only-untagged-versions: false
 
