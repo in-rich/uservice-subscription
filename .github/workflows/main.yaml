@@ -90,6 +90,7 @@ jobs:
     env:
       PORT: 1400
       GOPRIVATE: github.com/in-rich/*
+      DSN: postgres://postgres:postgres@localhost:1401/postgres?sslmode=disable
       REGISTRY: ghcr.io
       IMAGE_NAME: ${{ github.repository }}/${{ github.head_ref || github.ref_name }}
     steps:
@@ -126,6 +127,8 @@ jobs:
         run: |
           docker run -d \
             -p $PORT:$PORT --network="host" \
+            -e PORT=$PORT \
+            -e DSN="$DSN" \
             --name uservice-container \
             ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:test
           until [ "`docker inspect -f {{.State.Running}} uservice-container`"=="true" ]

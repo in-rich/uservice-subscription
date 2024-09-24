@@ -1,9 +1,4 @@
-server:
-  port: 1400
-postgres:
-  dsn: postgres://postgres:postgres@localhost:1401/postgres?sslmode=disable
-
-free-tier:
+sfree-tier:
   notes:
     max-edits: 999999
     count-edits-over: 24h

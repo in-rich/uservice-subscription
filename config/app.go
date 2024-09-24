@@ -15,6 +15,9 @@ var appStagingFile []byte
 //go:embed app.prod.yaml
 var appProdFile []byte
 
+//go:embed app.yaml
+var appFile []byte
+
 type NoteTierInformation struct {
 	MaxEdits       int            `yaml:"max-edits"`
 	CountEditsOver *time.Duration `yaml:"count-edits-over"`
@@ -35,6 +38,7 @@ type AppType struct {
 }
 
 var App = deploy.LoadConfig[AppType](
+	deploy.GlobalConfig(appFile),
 	deploy.DevConfig(appDevFile),
 	deploy.StagingConfig(appStagingFile),
 	deploy.ProdConfig(appProdFile),
