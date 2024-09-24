@@ -1,8 +1,3 @@
-server:
-  port: ${PORT}
-postgres:
-  dsn: ${DSN}
-
 free-tier:
   notes:
     max-edits: 999999

@@ -12,13 +12,7 @@ WORKDIR /
 
 COPY --from=builder /server /server
 
-ARG PORT=8080
-ARG DSN
-ARG ENV
-
-ENV PORT=$PORT
-ENV DSN=$DSN
-ENV ENV=$ENV
+ENV PORT=8080
 
 ENV HOST="0.0.0.0"
 
