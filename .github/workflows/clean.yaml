@@ -1,29 +1,16 @@
 name: clean
-
 on: [ delete ]
 
 jobs:
   delete-docker:
     if: github.event.ref_type == 'branch'
-    runs-on: ubuntu-latest
     permissions:
       contents: read
       packages: write
       attestations: write
       id-token: write
-    env:
-      IMAGE_NAME: ${{ github.event.repository.name }}/${{ github.event.ref }}
-    steps:
-      - name: Log in to the Container registry
-        uses: docker/login-action@v3
-        with:
-          registry: ghcr.io
-          username: ${{ github.actor }}
-          password: ${{ secrets.GITHUB_TOKEN }}
-      - uses: actions/delete-package-versions@v5
-        with:
-          package-name: ${{ env.IMAGE_NAME }}
-          package-type: 'container'
-          delete-only-pre-release-versions: false
-          delete-only-untagged-versions: false
-          min-versions-to-keep: 0
+    uses: in-rich/workflows/.github/workflows/clean-container.yaml@master
+    with:
+      repository_name: ${{ github.event.repository.name }}
+      ref: ${{ github.event.ref }}
+      actor: ${{ github.actor }}
