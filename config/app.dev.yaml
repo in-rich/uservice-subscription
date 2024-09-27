@@ -1,4 +1,4 @@
-sfree-tier:
+free-tier:
   notes:
     max-edits: 999999
     count-edits-over: 24h
