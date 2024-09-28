@@ -5,7 +5,7 @@ go 1.23.1
 require (
 	github.com/go-playground/validator/v10 v10.22.1
 	github.com/google/uuid v1.6.0
-	github.com/in-rich/lib-go v0.0.0-20240926161047-56e1ce82a22c
+	github.com/in-rich/lib-go v0.0.0-20240928165343-7e519fdfc9a0
 	github.com/in-rich/proto/proto-go v0.0.0-20240926072742-2db3ff45f9c2
 	github.com/samber/lo v1.47.0
 	github.com/stretchr/testify v1.9.0
