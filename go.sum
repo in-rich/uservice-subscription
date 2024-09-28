@@ -68,8 +68,8 @@ github.com/googleapis/enterprise-certificate-proxy v0.3.4 h1:XYIDZApgAnrN1c855gT
 github.com/googleapis/enterprise-certificate-proxy v0.3.4/go.mod h1:YKe7cfqYXjKGpGvmSg28/fFvhNzinZQm8DGnaburhGA=
 github.com/googleapis/gax-go/v2 v2.13.0 h1:yitjD5f7jQHhyDsnhKEBU52NdvvdSeGzlAnDPT0hH1s=
 github.com/googleapis/gax-go/v2 v2.13.0/go.mod h1:Z/fvTZXF8/uw7Xu5GuslPw+bplx6SS338j1Is2S+B7A=
-github.com/in-rich/lib-go v0.0.0-20240926161047-56e1ce82a22c h1:NIvVFfSxckeOv12Yv0PXhZw6OhBFEiv5qZ+VtTg6G2w=
-github.com/in-rich/lib-go v0.0.0-20240926161047-56e1ce82a22c/go.mod h1:eTF2y8K8bh+RXhtJT7jDRWysthMdBpa5fCxz47Nn2kQ=
+github.com/in-rich/lib-go v0.0.0-20240928165343-7e519fdfc9a0 h1:OK+kZbw12xniR3IULZaRC+jrk9O3a/l3ttU1TuLbEWo=
+github.com/in-rich/lib-go v0.0.0-20240928165343-7e519fdfc9a0/go.mod h1:eTF2y8K8bh+RXhtJT7jDRWysthMdBpa5fCxz47Nn2kQ=
 github.com/in-rich/proto/proto-go v0.0.0-20240926072742-2db3ff45f9c2 h1:KJHKlSIbDEwXh+jdU6Ew4hEU3rk4b5nGSKaeVZ39ROU=
 github.com/in-rich/proto/proto-go v0.0.0-20240926072742-2db3ff45f9c2/go.mod h1:6xkVt/kVFp54IOxkAyhATuB6bqdVj4BhxcNb183kxBQ=
 github.com/jinzhu/inflection v1.0.0 h1:K317FqzuhWc8YvSVlFMCCUb36O/S9MCKRDI7QkRKD/E=
