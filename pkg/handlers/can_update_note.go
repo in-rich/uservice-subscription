@@ -3,6 +3,7 @@ package handlers
 import (
 	"context"
 	"errors"
+	"github.com/in-rich/lib-go/monitor"
 	subscription_pb "github.com/in-rich/proto/proto-go/subscription"
 	"github.com/in-rich/uservice-subscription/config"
 	"github.com/in-rich/uservice-subscription/pkg/models"
@@ -15,9 +16,10 @@ import (
 type CanUpdateNoteHandler struct {
 	subscription_pb.CanUpdateNoteServer
 	service services.CanUpdateNoteService
+	logger  monitor.GRPCLogger
 }
 
-func (h *CanUpdateNoteHandler) CanUpdateNote(ctx context.Context, in *subscription_pb.CanUpdateNoteRequest) (*subscription_pb.CanUpdateNoteResponse, error) {
+func (h *CanUpdateNoteHandler) canUpdateNote(ctx context.Context, in *subscription_pb.CanUpdateNoteRequest) (*subscription_pb.CanUpdateNoteResponse, error) {
 	remainingEdits, err := h.service.Exec(ctx, &models.CanUpdateNoteRequest{
 		Target:           in.GetTarget(),
 		PublicIdentifier: in.GetPublicIdentifier(),
@@ -41,8 +43,15 @@ func (h *CanUpdateNoteHandler) CanUpdateNote(ctx context.Context, in *subscripti
 	}, nil
 }
 
-func NewCanUpdateNoteHandler(service services.CanUpdateNoteService) *CanUpdateNoteHandler {
+func (h *CanUpdateNoteHandler) CanUpdateNote(ctx context.Context, in *subscription_pb.CanUpdateNoteRequest) (*subscription_pb.CanUpdateNoteResponse, error) {
+	res, err := h.canUpdateNote(ctx, in)
+	h.logger.Report(ctx, "CanUpdateNote", err)
+	return res, err
+}
+
+func NewCanUpdateNoteHandler(service services.CanUpdateNoteService, logger monitor.GRPCLogger) *CanUpdateNoteHandler {
 	return &CanUpdateNoteHandler{
 		service: service,
+		logger:  logger,
 	}
 }
