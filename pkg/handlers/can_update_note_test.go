@@ -3,6 +3,7 @@ package handlers_test
 import (
 	"context"
 	"errors"
+	"github.com/in-rich/lib-go/monitor"
 	subscription_pb "github.com/in-rich/proto/proto-go/subscription"
 	"github.com/in-rich/uservice-subscription/pkg/handlers"
 	"github.com/in-rich/uservice-subscription/pkg/services"
@@ -74,7 +75,7 @@ func TestCanUpdateNote(t *testing.T) {
 			service := servicesmocks.NewMockCanUpdateNoteService(t)
 			service.On("Exec", context.TODO(), mock.Anything, mock.Anything, mock.Anything).Return(tt.serviceResp, tt.serviceErr)
 
-			handler := handlers.NewCanUpdateNoteHandler(service)
+			handler := handlers.NewCanUpdateNoteHandler(service, monitor.NewDummyGRPCLogger())
 
 			resp, err := handler.CanUpdateNote(context.TODO(), tt.in)
 
